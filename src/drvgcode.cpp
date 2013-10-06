@@ -69,6 +69,7 @@ void drvGCODE::show_path()
 {
 	Point currentPoint(0.0f, 0.0f);	
 	const Point firstPoint = pathElement(0).getPoint(0);
+	float scale = 1.0f / 72.0f * 25.4f; // pstoedit works natively at 72dpi but RepRaps like millimeters
 
 	for (unsigned int n = 0; n < numberOfElementsInPath(); n++) {
 		const basedrawingelement & elem = pathElement(n);
@@ -77,19 +78,19 @@ void drvGCODE::show_path()
 		case moveto:{
 				const Point & p = elem.getPoint(0);
 				outf << "\nM5\n";
-				outf << "G0 X" << p.x_ << " Y" << p.y_ << " F6000\n";
+				outf << "G0 X" << p.x_ * scale << " Y" << p.y_ * scale << " F6000\n";
 				outf << "\nM3\n";
 				currentPoint = p;
 			}
 			break;
 		case lineto:{
 				const Point & p = elem.getPoint(0);
-				outf << "G1 X" << p.x_ << " Y" << p.y_ << " F200\n";
+				outf << "G1 X" << p.x_ * scale << " Y" << p.y_ * scale << " F200\n";
 				currentPoint = p;
 			}
 			break;
 		case closepath:
-				outf << "G1 X" << firstPoint.x_ << " Y" << firstPoint.y_ << " F200\n";
+				outf << "G1 X" << firstPoint.x_ * scale << " Y" << firstPoint.y_ * scale << " F200\n";
 			break;
 
 		case curveto:{
@@ -108,7 +109,7 @@ void drvGCODE::show_path()
 			for (unsigned int s = 1; s < fitpoints; s++) {
 				const float t = 1.0f * s / (fitpoints - 1);
 				const Point pt = PointOnBezier(t, currentPoint, cp1, cp2, ep);
-				outf << "G1 X" << pt.x_ << " Y" << pt.y_ << " F200\n";
+				outf << "G1 X" << pt.x_ * scale << " Y" << pt.y_ * scale << " F200\n";
 			}
 			currentPoint = ep;
 
