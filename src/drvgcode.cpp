@@ -77,19 +77,19 @@ void drvGCODE::show_path()
 		case moveto:{
 				const Point & p = elem.getPoint(0);
 				outf << "\nM5\n";
-				outf << "G0 X" << p.x_ << " Y" << p.y_ << "\n";
+				outf << "G0 X" << p.x_ << " Y" << p.y_ << " F6000\n";
 				outf << "\nM3\n";
 				currentPoint = p;
 			}
 			break;
 		case lineto:{
 				const Point & p = elem.getPoint(0);
-				outf << "G1 X" << p.x_ << " Y" << p.y_ << "\n";
+				outf << "G1 X" << p.x_ << " Y" << p.y_ << " F200\n";
 				currentPoint = p;
 			}
 			break;
 		case closepath:
-				outf << "G1 X" << firstPoint.x_ << " Y" << firstPoint.y_ << "\n";
+				outf << "G1 X" << firstPoint.x_ << " Y" << firstPoint.y_ << " F200\n";
 			break;
 
 		case curveto:{
@@ -108,7 +108,7 @@ void drvGCODE::show_path()
 			for (unsigned int s = 1; s < fitpoints; s++) {
 				const float t = 1.0f * s / (fitpoints - 1);
 				const Point pt = PointOnBezier(t, currentPoint, cp1, cp2, ep);
-				outf << "G1 X" << pt.x_ << " Y" << pt.y_ << "\n";
+				outf << "G1 X" << pt.x_ << " Y" << pt.y_ << " F200\n";
 			}
 			currentPoint = ep;
 
