@@ -78,12 +78,12 @@ void drvGCODE::show_path()
 				const Point & p = elem.getPoint(0);
 				outf << "\nM5\n";
 				outf << "G0 X" << p.x_ << " Y" << p.y_ << "\n";
+				outf << "\nM3\n";
 				currentPoint = p;
 			}
 			break;
 		case lineto:{
 				const Point & p = elem.getPoint(0);
-				outf << "\nM3\n";
 				outf << "G1 X" << p.x_ << " Y" << p.y_ << "\n";
 				currentPoint = p;
 			}
@@ -108,7 +108,7 @@ void drvGCODE::show_path()
 			for (unsigned int s = 1; s < fitpoints; s++) {
 				const float t = 1.0f * s / (fitpoints - 1);
 				const Point pt = PointOnBezier(t, currentPoint, cp1, cp2, ep);
-				outf << " G1 X" << pt.x_ << " Y" << pt.y_ << "\n";
+				outf << "G1 X" << pt.x_ << " Y" << pt.y_ << "\n";
 			}
 			currentPoint = ep;
 
