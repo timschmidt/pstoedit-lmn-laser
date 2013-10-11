@@ -62,7 +62,7 @@ void drvGCODE::open_page()
 void drvGCODE::close_page()
 {
 	outf << "M5         ; laser off\n";
-	outf << "G28        ; home all axes\n";
+	outf << "G28 F200   ; home all axes\n";
 	outf << "G90        ; use absolute coordinates\n";
 	outf << "G0 Y558 F6000	; retract gantry for (un)loading\n";
 	outf << "M84        ; power down all stepper motors\n";
@@ -89,12 +89,12 @@ void drvGCODE::show_path()
 			break;
 		case lineto:{
 				const Point & p = elem.getPoint(0);
-				outf << "G1 X" << p.x_ * scale << " Y" << p.y_ * scale << " F200\n";
+				outf << "G1 X" << p.x_ * scale << " Y" << p.y_ * scale << " F70\n";
 				currentPoint = p;
 			}
 			break;
 		case closepath:
-				outf << "G1 X" << firstPoint.x_ * scale << " Y" << firstPoint.y_ * scale << " F200\n";
+				outf << "G1 X" << firstPoint.x_ * scale << " Y" << firstPoint.y_ * scale << " F70\n";
 			break;
 
 		case curveto:{
@@ -113,7 +113,7 @@ void drvGCODE::show_path()
 			for (unsigned int s = 1; s < fitpoints; s++) {
 				const float t = 1.0f * s / (fitpoints - 1);
 				const Point pt = PointOnBezier(t, currentPoint, cp1, cp2, ep);
-				outf << "G1 X" << pt.x_ * scale << " Y" << pt.y_ * scale << " F200\n";
+				outf << "G1 X" << pt.x_ * scale << " Y" << pt.y_ * scale << " F70\n";
 			}
 			currentPoint = ep;
 
