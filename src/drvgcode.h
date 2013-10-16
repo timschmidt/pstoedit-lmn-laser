@@ -41,10 +41,10 @@ public:
 		noheader(true,"-noheader",0,0,"produce gcode without a header",0,false),
 		nofooter(true,"-nofooter",0,0,"produce gcode without a footer",0,false),
 		speed(true,"-speed","string",0,
-	       "sets the cut speed of the laser",
+	       "sets the cut speed of the laser in mm/min",
 	       0,(const char*)"180"),
       		intensity(true,"-intensity","string",0,
-	       "sets the firing intensity of the laser",
+	       "sets the firing intensity of the laser as a percentage between 0 and 100",
 	       0,(const char*)"100")
 		{
 		ADD(noheader);

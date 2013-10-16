@@ -70,7 +70,6 @@ void drvGCODE::close_page()
 {
 	if (!options->nofooter) {
 	outf << "M5         ; laser off\n";
-	outf << "M204 S9000 ; enable accelleration\n";
 	outf << "G28 F200   ; home all axes\n";
 	outf << "G90        ; use absolute coordinates\n";
 	outf << "G0 Y558 F6000	; retract gantry for (un)loading\n";
