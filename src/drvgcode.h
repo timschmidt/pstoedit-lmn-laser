@@ -33,8 +33,24 @@ public:
 
 	class DriverOptions : public ProgramOptions {
 	public:
-		DriverOptions() 
+	OptionT < bool, BoolTrueExtractor > noheader;
+	OptionT < bool, BoolTrueExtractor > nofooter;
+	OptionT < RSString, RSStringValueExtractor > speed;
+	OptionT < RSString, RSStringValueExtractor > intensity;
+	DriverOptions():
+		noheader(true,"-noheader",0,0,"produce gcode without a header",0,false),
+		nofooter(true,"-nofooter",0,0,"produce gcode without a footer",0,false),
+		speed(true,"-speed","string",0,
+	       "sets the cut speed of the laser",
+	       0,(const char*)"180"),
+      		intensity(true,"-intensity","string",0,
+	       "sets the firing intensity of the laser",
+	       0,(const char*)"100")
 		{
+		ADD(noheader);
+		ADD(nofooter);
+		ADD(speed);
+		ADD(intensity);
 		}
 	}*options;
 

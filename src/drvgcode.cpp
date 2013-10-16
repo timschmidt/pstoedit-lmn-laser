@@ -34,7 +34,12 @@ drvGCODE::derivedConstructor(drvGCODE):
 constructBase
 {
 // driver specific initializations
-	
+	if (options->intensity.value != "") {
+		options->intensity.value = "M3 S" + options->intensity.value + "\n";
+	} else {
+		options->intensity.value = "M3\n";
+	}
+
 }
 
 drvGCODE::~drvGCODE()
@@ -44,6 +49,7 @@ drvGCODE::~drvGCODE()
 
 void drvGCODE::open_page()
 {
+	if (!options->noheader) {
 	//date and time of convertion
 	time_t kz = time(NULL);;
 	struct tm *ozt = localtime(&kz);
@@ -58,22 +64,26 @@ void drvGCODE::open_page()
 	outf << "G90            ; set absolute positioning\n";
 	outf << "G92 X0 Y0	; zero x and y axes\n";
 	}
+}
 
 void drvGCODE::close_page()
 {
+	if (!options->nofooter) {
 	outf << "M5         ; laser off\n";
+	outf << "M204 S9000 ; enable accelleration\n";
 	outf << "G28 F200   ; home all axes\n";
 	outf << "G90        ; use absolute coordinates\n";
 	outf << "G0 Y558 F6000	; retract gantry for (un)loading\n";
 	outf << "M84        ; power down all stepper motors\n";
 	outf << "M107       ; fan off\n";
+	}
 }
 
 void drvGCODE::show_path()
 {
 	Point currentPoint(0.0f, 0.0f);	
 	const Point firstPoint = pathElement(0).getPoint(0);
-	float scale = 1.0f / 72.0f * 25.4f; // pstoedit works natively at 72dpi but RepRaps like millimeters
+	const float scale = 1.0f / 72.0f * 25.4f; // pstoedit works natively at 72dpi but RepRaps like millimeters	
 
 	for (unsigned int n = 0; n < numberOfElementsInPath(); n++) {
 		const basedrawingelement & elem = pathElement(n);
@@ -83,18 +93,18 @@ void drvGCODE::show_path()
 				const Point & p = elem.getPoint(0);
 				outf << "\nM5\n";
 				outf << "G0 X" << p.x_ * scale << " Y" << p.y_ * scale << " F6000\n";
-				outf << "\nM3\n";
+				outf << "\n" << options->intensity.value; // fire the laser
 				currentPoint = p;
 			}
 			break;
 		case lineto:{
 				const Point & p = elem.getPoint(0);
-				outf << "G1 X" << p.x_ * scale << " Y" << p.y_ * scale << " F70\n";
+				outf << "G1 X" << p.x_ * scale << " Y" << p.y_ * scale << " F" << options->speed.value << "\n";
 				currentPoint = p;
 			}
 			break;
 		case closepath:
-				outf << "G1 X" << firstPoint.x_ * scale << " Y" << firstPoint.y_ * scale << " F70\n";
+				outf << "G1 X" << firstPoint.x_ * scale << " Y" << firstPoint.y_ * scale << " F" << options->speed.value << "\n";
 			break;
 
 		case curveto:{
@@ -113,7 +123,7 @@ void drvGCODE::show_path()
 			for (unsigned int s = 1; s < fitpoints; s++) {
 				const float t = 1.0f * s / (fitpoints - 1);
 				const Point pt = PointOnBezier(t, currentPoint, cp1, cp2, ep);
-				outf << "G1 X" << pt.x_ * scale << " Y" << pt.y_ * scale << " F70\n";
+				outf << "G1 X" << pt.x_ * scale << " Y" << pt.y_ * scale << " F" << options->speed.value << "\n";
 			}
 			currentPoint = ep;
 
