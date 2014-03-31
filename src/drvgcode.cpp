@@ -39,6 +39,9 @@ constructBase
 	} else {
 		options->intensity.value = "M3\n";
 	}
+	if (options->traversal.value == "") {
+		options->traversal.value = "6000";
+	}
 
 }
 
@@ -91,7 +94,7 @@ void drvGCODE::show_path()
 		case moveto:{
 				const Point & p = elem.getPoint(0);
 				outf << "\nM5\n";
-				outf << "G0 X" << p.x_ * scale << " Y" << p.y_ * scale << " F6000\n";
+				outf << "G0 X" << p.x_ * scale << " Y" << p.y_ * scale << " F" << options->traversal.value << "\n";
 				outf << "\n" << options->intensity.value; // fire the laser
 				currentPoint = p;
 			}

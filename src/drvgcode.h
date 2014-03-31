@@ -37,20 +37,25 @@ public:
 	OptionT < bool, BoolTrueExtractor > nofooter;
 	OptionT < RSString, RSStringValueExtractor > speed;
 	OptionT < RSString, RSStringValueExtractor > intensity;
+	OptionT < RSString, RSStringValueExtractor > traversal;
 	DriverOptions():
 		noheader(true,"-noheader",0,0,"produce gcode without a header",0,false),
 		nofooter(true,"-nofooter",0,0,"produce gcode without a footer",0,false),
 		speed(true,"-speed","string",0,
 	       "sets the cut speed of the laser in mm/min",
 	       0,(const char*)"180"),
-      		intensity(true,"-intensity","string",0,
+		intensity(true,"-intensity","string",0,
 	       "sets the firing intensity of the laser as a percentage between 0 and 100",
-	       0,(const char*)"100")
+	       0,(const char*)"100"),
+	    traversal(true, "-traversal", "string", 0,
+	       "sets the tranversal speed of the laser in mm/min",
+	       0, (const char*)"6000")
 		{
 		ADD(noheader);
 		ADD(nofooter);
 		ADD(speed);
 		ADD(intensity);
+		ADD(traversal);
 		}
 	}*options;
 
