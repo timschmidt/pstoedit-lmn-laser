@@ -1,7 +1,7 @@
 #ifndef __drvGCODE_H
 #define __drvGCODE_H
 
-/* 
+/*
    drvGCODE.h : This file is part of pstoedit
    Contributed / Copyright 2008 by: Lawrence Glaister VE7IT
 
@@ -35,12 +35,14 @@ public:
 	public:
 	OptionT < bool, BoolTrueExtractor > noheader;
 	OptionT < bool, BoolTrueExtractor > nofooter;
+	OptionT < bool, BoolTrueExtractor > usebezier;
 	OptionT < RSString, RSStringValueExtractor > speed;
 	OptionT < RSString, RSStringValueExtractor > intensity;
 	OptionT < RSString, RSStringValueExtractor > traversal;
 	DriverOptions():
 		noheader(true,"-noheader",0,0,"produce gcode without a header",0,false),
 		nofooter(true,"-nofooter",0,0,"produce gcode without a footer",0,false),
+		usebezier(true, "-usebezier", 0, 0, "use G5 bezier curves", 0, false),
 		speed(true,"-speed","string",0,
 	       "sets the cut speed of the laser in mm/min",
 	       0,(const char*)"180"),
@@ -53,6 +55,7 @@ public:
 		{
 		ADD(noheader);
 		ADD(nofooter);
+		ADD(usebezier);
 		ADD(speed);
 		ADD(intensity);
 		ADD(traversal);
@@ -66,5 +69,5 @@ private:
 };
 #endif
 
- 
- 
+
+
