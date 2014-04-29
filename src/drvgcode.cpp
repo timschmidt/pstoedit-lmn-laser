@@ -1,7 +1,7 @@
-/* 
+/*
    drvgcode.cpp : This file is part of pstoedit
    simple backend for CNC g code format.
-   Contributed / Copyright 2008 by: Lawrence Glaister VE7IT 
+   Contributed / Copyright 2008 by: Lawrence Glaister VE7IT
 
    Copyright (C) 1993 - 2013 Wolfgang Glunz, wglunz35_AT_pstoedit.net
    (for the skeleton and the rest of pstoedit)
@@ -83,9 +83,9 @@ void drvGCODE::close_page()
 
 void drvGCODE::show_path()
 {
-	Point currentPoint(0.0f, 0.0f);	
+	Point currentPoint(0.0f, 0.0f);
 	const Point firstPoint = pathElement(0).getPoint(0);
-	const float scale = 1.0f / 72.0f * 25.4f; // pstoedit works natively at 72dpi but RepRaps like millimeters	
+	const float scale = 1.0f / 72.0f * 25.4f; // pstoedit works natively at 72dpi but RepRaps like millimeters
 
 	for (unsigned int n = 0; n < numberOfElementsInPath(); n++) {
 		const basedrawingelement & elem = pathElement(n);
@@ -113,22 +113,25 @@ void drvGCODE::show_path()
 			const Point & cp1 = elem.getPoint(0);
 			const Point & cp2 = elem.getPoint(1);
 			const Point & ep  = elem.getPoint(2);
-			// curve is approximated with a variable number or linear segments.
-			// fitpoints should be somewhere between 5 and 50 for reasonable page size plots
-			// we compute distance between current point and endpoint and use that to help
-			// pick the number of segments to use.
-			const float dist = (float) pythagoras((float)(ep.x_ - currentPoint.x_),(float)(ep.y_ - currentPoint.y_)); 
-			unsigned int fitpoints = (unsigned int)(dist / 10.0);
-			if ( fitpoints < 5 ) fitpoints = 5;
-			if ( fitpoints > 50 ) fitpoints = 50;
+			if (!options->usebezier) {
+				// curve is approximated with a variable number or linear segments.
+				// fitpoints should be somewhere between 5 and 50 for reasonable page size plots
+				// we compute distance between current point and endpoint and use that to help
+				// pick the number of segments to use.
+				const float dist = (float) pythagoras((float)(ep.x_ - currentPoint.x_),(float)(ep.y_ - currentPoint.y_));
+				unsigned int fitpoints = (unsigned int)(dist / 10.0);
+				if ( fitpoints < 5 ) fitpoints = 5;
+				if ( fitpoints > 50 ) fitpoints = 50;
 
-			for (unsigned int s = 1; s < fitpoints; s++) {
-				const float t = 1.0f * s / (fitpoints - 1);
-				const Point pt = PointOnBezier(t, currentPoint, cp1, cp2, ep);
-				outf << "G1 X" << pt.x_ * scale << " Y" << pt.y_ * scale << " F" << options->speed.value << "\n";
+				for (unsigned int s = 1; s < fitpoints; s++) {
+					const float t = 1.0f * s / (fitpoints - 1);
+					const Point pt = PointOnBezier(t, currentPoint, cp1, cp2, ep);
+					outf << "G1 X" << pt.x_ * scale << " Y" << pt.y_ * scale << " F" << options->speed.value << "\n";
+				}
+				currentPoint = ep;
+			} else {
+				outf << "G5 X" << ep.x_ * scale << " Y" << ep.y_ * scale << " I" << cp1.x_ * scale << " J" << cp1.y_ * scale << " K" << cp2.x_ * scale << " L" << cp2.y_ * scale << "\n";
 			}
-			currentPoint = ep;
-
 			}
 			break;
 		default:
@@ -140,18 +143,18 @@ void drvGCODE::show_path()
 }
 
 
-static DriverDescriptionT < drvGCODE > D_gcode("gcode", "RepRap gcode format", 
+static DriverDescriptionT < drvGCODE > D_gcode("gcode", "RepRap gcode format",
 												 "See also:  \\URL{http://reprap.org/wiki/G-code} ","gcode", false,	// if backend supports subpathes
 												   // if subpathes are supported, the backend must deal with
 												   // sequences of the following form
 												   // moveto (start of subpath)
 												   // lineto (a line segment)
-												   // lineto 
+												   // lineto
 												   // moveto (start of a new subpath)
 												   // lineto (a line segment)
-												   // lineto 
+												   // lineto
 												   //
-												   // If this argument is set to false each subpath is drawn 
+												   // If this argument is set to false each subpath is drawn
 												   // individually which might not necessarily represent
 												   // the original drawing.
 												   true,	// if backend supports curves
@@ -160,4 +163,4 @@ static DriverDescriptionT < drvGCODE > D_gcode("gcode", "RepRap gcode format",
 												   DriverDescription::noimage,	// no support for PNG file images
 												   DriverDescription::normalopen, false,	// if format supports multiple pages in one file
 												   false /*clipping */ );
- 
+
